@@ -1,0 +1,440 @@
+" vim: fdm=marker
+
+" ============================================================================
+"        _                                          _____
+" _   __(_)___ ___  __________    _________  ____  / __(_)___ _
+"| | / / / __ `__ \/ ___/ ___/   / ___/ __ \/ __ \/ /_/ / __ `/
+"| |/ / / / / / / / /  / /__    / /__/ /_/ / / / / __/ / /_/ /
+"|___/_/_/ /_/ /_/_/   \___/____\___/\____/_/ /_/_/ /_/\__, /
+"                         /_____/                     /____/
+"
+"   /  |/  /__  /  / / / /
+"  / /|_/ /  / /  / /_/ /
+" / /  / /  / /__/ __  /
+"/_/  /_/  /____/_/ /_/
+"
+" Author: Martin Zumaya, June 2020
+"
+" ============================================================================
+" Neovim default {{{1
+" ============================================================================
+"if 0 | endif
+
+if &compatible
+   set nocompatible
+endif
+"
+" let $NVIM_TUI_ENABLE_CURSOR_SHAPE=0
+" set nocompatible
+
+" ============================================================================
+" Plugins {{{1
+" ============================================================================
+
+call plug#begin('~/.vim/plugged')
+
+" Version Control
+Plug 'mhinz/vim-signify'
+Plug 'tpope/vim-fugitive'
+
+" Colorschemes
+Plug 'joshdick/onedark.vim'
+
+" UI Layout
+Plug 'ryanoasis/vim-devicons'
+Plug 'machakann/vim-highlightedyank'
+Plug 'itchyny/lightline.vim'
+Plug 'macthecadillac/lightline-gitdiff'
+Plug 'pacha/vem-tabline'
+
+" Terminal
+" Plug 'kassio/neoterm'
+" Plug 'jpalardy/vim-slime'
+
+" Autocomplete
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+Plug 'Shougo/deoplete.nvim'
+Plug 'roxma/nvim-yarp'
+Plug 'roxma/vim-hug-neovim-rpc'
+let g:deoplete#enable_at_startup=1
+
+" File manager
+Plug 'scrooloose/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
+
+" Code Navigation
+Plug 'myusuf3/numbers.vim'
+
+" Writting
+Plug 'machakann/vim-sandwich'
+Plug 'junegunn/vim-easy-align'
+Plug 'Yggdroot/indentLine'
+Plug 'jiangmiao/auto-pairs'
+Plug 'ntpeters/vim-better-whitespace'
+Plug 'scrooloose/nerdcommenter'
+Plug 'chaoren/vim-wordmotion'
+Plug 'justinmk/vim-sneak'
+ Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+" Plug 'sbdchd/vim-shebang'
+" Plug 'mattn/emmet-vim'
+
+" Syntax
+Plug 'octol/vim-cpp-enhanced-highlight'
+" Plug 'ivanov/vim-ipython'
+
+" Python related
+Plug 'vim-python/python-syntax'
+Plug 'Vimjas/vim-python-pep8-indent'
+Plug 'hanschen/vim-ipython-cell', { 'for': 'python' }
+
+" Julia related
+Plug 'mroavi/vim-julia-cell'
+Plug 'JuliaEditorSupport/julia-vim'
+
+" Taskwarrior and Wiki
+" Plug 'powerman/vim-plugin-AnsiEsc'
+" Plug 'majutsushi/tagbar'
+" Plug 'blindFS/vim-taskwarrior'
+" Plug 'vimwiki/vimwiki', { 'as' : 'vimwiki', 'branch' : 'dev'}
+" Plug 'tbabej/taskwiki'
+
+call plug#end()
+
+" ============================================================================
+" Basic settings and maps {{{1
+" ============================================================================
+
+runtime macros/matchit.vim
+
+syntax enable
+filetype plugin indent on
+filetype plugin on
+
+set hidden
+set autoread
+set linebreak
+set expandtab
+set cursorline
+set splitright
+set noshowmode
+set noswapfile
+set is
+
+set shell=bash
+set shiftwidth=4
+set softtabstop=4
+set textwidth=110
+set colorcolumn=114
+
+if !exists('##TextYankPost')
+  map y <Plug>(highlightedyank)
+endif
+
+let g:highlightedyank_highlight_duration = 500
+
+" Set up leader key
+let mapleader = "\<Space>"
+
+" Clear highlighted search
+nmap <silent> ,/ :nohlsearch<CR>
+
+" Substitute word in cursor
+nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
+
+" Move visual selection
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+
+" Duplicate lines
+nnoremap zj mzyyP`z
+nnoremap zk mzyyP`zk
+
+autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+
+" ============================================================================
+" UI Config {{{1
+" ============================================================================
+
+set laststatus=2
+set encoding=utf8
+
+" Don't let terminal override my vim settings
+" set notermguicolors
+" let t_Co = 256
+" if (has("termguicolors"))
+"     set termguicolors
+" endif
+
+" set guifont=IBM\ Plex\ Mono:h14
+
+colorscheme onedark
+
+" Remove background
+hi Normal guibg=NONE ctermbg=NONE
+
+" Indent line level indicators
+let g:indentLine_char_list = ['|', '¦', '┆', '┊']
+
+let g:lightline = {
+            \ 'colorscheme': 'onedark',
+            \ 'enable': {'tabline': 0},
+            \ 'active': {
+            \ 'left': [ [ 'mode', 'paste' ],
+            \ ['readonly', 'filename', 'modified'] ]
+            \ }
+            \ }
+
+let g:vem_tabline_show_icon=1
+let g:vem_tabline_show=2
+let g:vem_tabline_show_number='index'
+
+highlight VemTablineTabSelected term=bold cterm=bold ctermfg=0 ctermbg=255 guifg=#242424 guibg=#ffffff gui=bold
+
+nmap <leader>h <Plug>vem_move_buffer_left-
+nmap <leader>l <Plug>vem_move_buffer_right-
+nmap <leader>p <Plug>vem_prev_buffer-
+nmap <leader>n <Plug>vem_next_buffer-
+
+nnoremap <leader>1 :1tabnext<CR>
+nnoremap <leader>2 :2tabnext<CR>
+nnoremap <leader>3 :3tabnext<CR>
+
+function! DeleteCurrentBuffer() abort
+    let current_buffer = bufnr('%')
+    let next_buffer = g:vem_tabline#tabline.get_replacement_buffer()
+    try
+        exec 'confirm ' . current_buffer . 'bdelete'
+        if next_buffer != 0
+            exec next_buffer . 'buffer'
+        endif
+    catch /E516:/
+       " If the operation is cancelled, do nothing
+    endtry
+endfunction
+nmap <leader>d :call DeleteCurrentBuffer()<CR>
+
+" ============================================================================
+" NERDTree {{{1
+" ============================================================================
+
+" autocmd vimenter * if !argc() | NERDTree | endif
+let g:NERDTreeWinPos="right"
+let g:NERDTreeWinSize=50
+silent! nmap <C-p> :NERDTreeToggle<CR>
+silent! nmap <C-\> :NERDTreeFocus<CR>
+
+" ============================================================================
+" CPP Config {{{1
+" ============================================================================
+
+let g:cpp_class_scope_highlight = 1
+let g:cpp_member_variable_highlight = 1
+let g:cpp_class_decl_highlight = 1
+
+" ============================================================================
+" NERDcommenter {{{1
+" ============================================================================
+
+" Add a space between comment delimiter and comment
+let g:NERDSpaceDelims = 1
+" Enable trimming of trailing whitespace when uncommenting
+let g:NERDTrimTrailingWhitespace = 1
+" Align line-wise comment delimiters flush left instead of following code indentation
+let g:NERDDefaultAlign = 'left'
+" Allow commenting and inverting empty lines (useful when commenting a region)
+let g:NERDCommentEmptyLines = 1
+
+" ============================================================================
+" Snippets {{{1
+" ============================================================================
+
+" Trigger configuration. Do not use <tab> if you use
+" https://github.com/Valloric/YouCompleteMe.
+let g:UltiSnipsExpandTrigger='<tab>'
+
+" shortcut to go to next position
+let g:UltiSnipsJumpForwardTrigger='<c-j>'
+
+" shortcut to go to previous position
+let g:UltiSnipsJumpBackwardTrigger='<c-k>'
+
+" ============================================================================
+" EasyAlign {{{1
+" ============================================================================
+
+nmap ga <Plug>(EasyAlign)
+xmap ga <Plug>(EasyAlign)
+
+" ============================================================================
+" Whitespace {{{1
+" ============================================================================
+
+let g:current_line_whitespace_disabled_soft=1
+let g:better_whitespace_enabled=1
+let g:better_whitespace_operator='_s'
+let g:better_whitespace_skip_empty_lines=1
+" let g:strip_whitespace_on_save=1
+
+" nnoremap ]w :NextTrailingWhitespace<CR>
+" nnoremap [w :PrevTrailingWhitespace<CR>
+" Easymotion {{{1
+" ============================================================================
+
+highlight Sneak      guifg=white guibg=green  ctermfg=white ctermbg=green
+highlight SneakScope guifg=red   guibg=yellow ctermfg=red   ctermbg=yellow
+
+let g:sneak#label = 1
+
+map s <Plug>Sneak_s
+map f <Plug>Sneak_f
+map F <Plug>Sneak_F
+map t <Plug>Sneak_t
+map T <Plug>Sneak_T
+
+" ============================================================================
+" Wordmotion {{{1
+" ============================================================================
+
+let g:wordmotion_prefix = ','
+
+" ============================================================================
+" ============================================================================
+" Sandwich {{{1
+" ============================================================================
+
+runtime macros/sandwich/keymap/surround.vim
+
+let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
+
+xmap is <Plug>(textobj-sandwich-query-i)
+xmap as <Plug>(textobj-sandwich-query-a)
+omap is <Plug>(textobj-sandwich-query-i)
+omap as <Plug>(textobj-sandwich-query-a)
+
+xmap iss <Plug>(textobj-sandwich-auto-i)
+xmap ass <Plug>(textobj-sandwich-auto-a)
+omap iss <Plug>(textobj-sandwich-auto-i)
+omap ass <Plug>(textobj-sandwich-auto-a)
+
+xmap im <Plug>(textobj-sandwich-literal-query-i)
+xmap am <Plug>(textobj-sandwich-literal-query-a)
+omap im <Plug>(textobj-sandwich-literal-query-i)
+omap am <Plug>(textobj-sandwich-literal-query-a)
+
+" Autopairs {{{1
+" ============================================================================
+
+let g:AutoPairsFlyMode = 0
+let g:AutoPairsShortcutBackInsert = '<A-b>'
+
+" Version Control {{{1
+" ============================================================================
+
+set updatetime=30
+
+let g:signify_sign_add = '▴'
+let g:signify_sign_delete = '▾'
+let g:signify_sign_delete_first_line = '▪'
+let g:signify_sign_change = '▸'
+
+let g:signify_sign_show_count = 0
+
+let g:NERDTreeShowIgnoredStatus=1
+let g:NERDTreeIndicatorMapCustom = {
+    \ "Modified"  : "✹",
+    \ "Staged"    : "✚",
+    \ "Untracked" : "✭",
+    \ "Renamed"   : "➜",
+    \ "Unmerged"  : "═",
+    \ "Deleted"   : "✖",
+    \ "Dirty"     : "✗",
+    \ "Clean"     : "✔︎",
+    \ 'Ignored'   : '☒',
+    \ "Unknown"   : "?"
+    \ }
+
+" ============================================================================
+" Terminal {{{1
+" ============================================================================
+
+" Julia related
+" Use '##' tags to define cells
+let g:julia_cell_delimit_cells_by = 'tags'
+" map <Leader>jr to run entire file
+nnoremap <Leader>jr :JuliaCellRun<CR>
+" map <Leader>jc to execute the current cell
+nnoremap <Leader>jc :JuliaCellExecuteCell<CR>
+" map <Leader>jC to execute the current cell and jump to the next cell
+nnoremap <Leader>jC :JuliaCellExecuteCellJump<CR>
+" map <Leader>jl to clear Julia screen
+nnoremap <Leader>jl :JuliaCellClear<CR>
+" map <Leader>jp and <Leader>jn to jump to the previous and next cell header
+nnoremap <Leader>jp :JuliaCellPrevCell<CR>
+nnoremap <Leader>jn :JuliaCellNextCell<CR>
+
+" let g:slime_target = 'neovim'
+let g:slime_target = 'tmux'
+let g:slime_default_config = {"socket_name": "default", "target_pane": "{right-of}"}
+let g:slime_dont_ask_default = 1
+let g:slime_cell_delimiter = "##"
+
+nmap <C-s> <Plug>SlimeLineSend
+xmap <C-s> <Plug>SlimeRegionSend
+nmap <C-j> <Plug>SlimeSendCell
+
+" Clears jlia REPL
+autocmd FileType julia nmap <C-l> :silent !tmux send-keys -t "{right-of}" C-l <cr>
+
+autocmd FileType julia setlocal textwidth=100
+autocmd FileType julia setlocal colorcolumn=105
+
+" ============================================================================
+" Python Related {{{1
+" ============================================================================
+
+autocmd BufNewFile,BufRead *.py
+    \set filetype=python
+    \set tabstop=4
+    \set softtabstop=4
+    \set shiftwidth=4
+    \set expandtab
+    \set autoindent
+    \set fileformat=unix
+    \set textwidth=92
+    \set colorcolumn=93
+    
+let g:python_highlight_all = 1
+autocmd FileType python let g:slime_cell_delimiter = "# %"
+
+let g:ipython_cell_delimit_cells_by = 'tags'
+" fix paste issues in ipython
+let g:slime_python_ipython = 1
+
+autocmd FileType python nnoremap <Leader>jl :IPythonCellClear<CR>
+autocmd FileType python nnoremap <Leader>jp :IPythonCellPrevCell<CR>
+autocmd FileType python nnoremap <Leader>jn :IPythonCellNextCell<CR>
+autocmd FileType python nnoremap <Leader>jx :IPythonCellClose<CR>
+
+" Buffers {{{1
+" ============================================================================
+
+command! -nargs=+ Bs :vert sbuffer <args>
+
+" nnoremap <C-D-<Down>>  <C-W><C-J>
+" nnoremap <C-D-<Up>>    <C-W><C-K>
+" nnoremap <C-D-<Right>> <C-W><C-L>
+" nnoremap <C-D-<Left>>  <C-W><C-H>
+
+" Commands to deal with the buffers without going all the way through the
+" colon
+nnoremap <silent> <leader>bn :bn<CR>
+nnoremap <silent> <leader>bp :bp<CR>
+nnoremap <silent> <leader>ls :ls<CR>
+nnoremap <silent> <leader>bs1 :Bs 1<CR>
+nnoremap <silent> <leader>bs2 :Bs 2<CR>
+nnoremap <silent> <leader>bs3 :Bs 3<CR>
+nnoremap <silent> <leader>bs4 :Bs 4<CR>
+nnoremap <silent> <leader>bs5 :Bs 5<CR>
+
+" ============================================================================
