@@ -1,0 +1,307 @@
+" vim: fdm=marker
+
+" ============================================================================
+"        _                                          _____
+" _   __(_)___ ___  __________    _________  ____  / __(_)___ _
+"| | / / / __ `__ \/ ___/ ___/   / ___/ __ \/ __ \/ /_/ / __ `/
+"| |/ / / / / / / / /  / /__    / /__/ /_/ / / / / __/ / /_/ /
+"|___/_/_/ /_/ /_/_/   \___/____\___/\____/_/ /_/_/ /_/\__, /
+"                         /_____/                     /____/
+"
+"   /  |/  /__  /  / / / /
+"  / /|_/ /  / /  / /_/ /
+" / /  / /  / /__/ __  /
+"/_/  /_/  /____/_/ /_/
+"
+" Author: Martin Zumaya, June 2020
+"
+" ============================================================================
+" Neovim default {{{1
+" ============================================================================
+if 0 | endif
+
+if &compatible
+    set nocompatible
+endif
+
+" let $NVIM_TUI_ENABLE_CURSOR_SHAPE=0
+
+" ============================================================================
+" Plugins {{{1
+" ============================================================================
+
+call plug#begin('~/.local/share/nvim/plugged')
+
+" UI Layout
+" Plug 'machakann/vim-highlightedyank'
+
+" Code Navigation
+" Plug 'myusuf3/numbers.vim'
+
+" Writing
+Plug 'machakann/vim-sandwich'
+Plug 'junegunn/vim-easy-align'
+Plug 'jiangmiao/auto-pairs'
+Plug 'asvetliakov/vim-easymotion'
+" Plug 'justinmk/vim-sneak'
+Plug 'chaoren/vim-wordmotion'
+Plug 'ntpeters/vim-better-whitespace'
+" Plug 'mattn/emmet-vim'
+
+" Python related
+Plug 'vim-python/python-syntax'
+Plug 'hanschen/vim-ipython-cell', { 'for': 'python' }
+" Plug 'Vimjas/vim-python-pep8-indent'
+
+" Julia related
+Plug 'mroavi/vim-julia-cell'
+" Plug 'JuliaEditorSupport/julia-vim'
+" Plug 'kdheepak/JuliaFormatter.vim'
+
+call plug#end()
+
+" ============================================================================
+" Basic settings and maps {{{1
+" ============================================================================
+
+runtime macros/matchit.vim
+
+syntax enable
+filetype plugin indent on
+filetype plugin on
+
+set encoding=utf8
+set hidden
+set autoread
+set linebreak
+set expandtab
+set cursorline
+set splitright
+set noshowmode
+set noswapfile
+set is
+
+set shell=zsh
+set shiftwidth=4
+set softtabstop=4
+set textwidth=110
+set colorcolumn=114
+
+" let g:highlightedyank_highlight_duration = 500
+
+" Set up leader key
+let mapleader = "\<Space>"
+
+" Clear highlighted search
+nmap <silent> ,/ :nohlsearch<CR>
+
+" Substitute word in cursor
+" nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
+
+" Move visual selection
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+
+" Duplicate lines
+nnoremap zj mzyyP`z
+nnoremap zk mzyyP`zk
+
+" Do not insert comments when opening a line from a commented one
+autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+
+" ============================================================================
+" Comments {{{1
+" ============================================================================
+
+xmap gc  <Plug>VSCodeCommentary
+nmap gc  <Plug>VSCodeCommentary
+omap gc  <Plug>VSCodeCommentary
+nmap gcc <Plug>VSCodeCommentaryLine
+
+" ============================================================================
+" EasyAlign {{{1
+" ============================================================================
+
+nmap ga <Plug>(EasyAlign)
+xmap ga <Plug>(EasyAlign)
+
+" ============================================================================
+" Whitespace {{{1
+" ============================================================================
+
+let g:current_line_whitespace_disabled_soft=1
+let g:better_whitespace_enabled=1
+let g:better_whitespace_operator='_s'
+let g:better_whitespace_skip_empty_lines=1
+let g:strip_whitespace_on_save=1
+
+" nnoremap ]w :NextTrailingWhitespace<CR>
+" nnoremap [w :PrevTrailingWhitespace<CR>
+
+" ============================================================================
+" Easymotion {{{1
+" ============================================================================
+
+" highlight Sneak      guifg=white guibg=green  ctermfg=white ctermbg=green
+" highlight SneakScope guifg=red   guibg=yellow ctermfg=red   ctermbg=yellow
+
+" let g:sneak#label = 1
+
+" map s <Plug>Sneak_s
+" map f <Plug>Sneak_f
+" map F <Plug>Sneak_F
+" map t <Plug>Sneak_t
+" map T <Plug>Sneak_T
+
+" ============================================================================
+" Wordmotion {{{1
+" ============================================================================
+
+let g:wordmotion_prefix = ','
+
+" ============================================================================
+" Sandwich {{{1
+" ============================================================================
+
+runtime macros/sandwich/keymap/surround.vim
+
+let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
+
+xmap is <Plug>(textobj-sandwich-query-i)
+xmap as <Plug>(textobj-sandwich-query-a)
+omap is <Plug>(textobj-sandwich-query-i)
+omap as <Plug>(textobj-sandwich-query-a)
+
+xmap iss <Plug>(textobj-sandwich-auto-i)
+xmap ass <Plug>(textobj-sandwich-auto-a)
+omap iss <Plug>(textobj-sandwich-auto-i)
+omap ass <Plug>(textobj-sandwich-auto-a)
+
+xmap im <Plug>(textobj-sandwich-literal-query-i)
+xmap am <Plug>(textobj-sandwich-literal-query-a)
+omap im <Plug>(textobj-sandwich-literal-query-i)
+omap am <Plug>(textobj-sandwich-literal-query-a)
+
+" ============================================================================
+" Autopairs {{{1
+" ============================================================================
+
+let g:AutoPairsFlyMode = 0
+let g:AutoPairsShortcutBackInsert = '<A-b>'
+
+" ============================================================================
+" Python Related {{{1
+" ============================================================================
+
+autocmd BufNewFile,BufRead *.py
+    \set filetype=python
+    \set tabstop=4
+    \set softtabstop=4
+    \set shiftwidth=4
+    \set expandtab
+    \set autoindent
+    \set fileformat=unix
+    \set textwidth=92
+    \set colorcolumn=93
+    
+let g:python_highlight_all = 1
+autocmd FileType python let g:slime_cell_delimiter = "# %"
+
+let g:ipython_cell_delimit_cells_by = 'tags'
+" fix paste issues in ipython
+let g:slime_python_ipython = 1
+
+autocmd FileType python nnoremap <Leader>jl :IPythonCellClear<CR>
+autocmd FileType python nnoremap <Leader>jp :IPythonCellPrevCell<CR>
+autocmd FileType python nnoremap <Leader>jn :IPythonCellNextCell<CR>
+autocmd FileType python nnoremap <Leader>jx :IPythonCellClose<CR>
+
+" ============================================================================
+" Julia Related {{{1
+" ============================================================================
+
+" fix Julia highlighting
+autocmd BufRead,BufNewFile *.jl set filetype=julia
+
+autocmd FileType julia setlocal textwidth=92
+autocmd FileType julia setlocal colorcolumn=93
+
+autocmd FileType julia let g:slime_cell_delimiter = "##"
+let g:julia_cell_delimit_cells_by = 'tags' " Use '##' tags to define cells
+
+" let g:latex_to_unicode_keymap = 1
+
+" map <Leader>jr to run entire file
+" nnoremap <Leader>jr :JuliaCellRun<CR>
+" autocmd FileType julia nnoremap <Leader>jl :JuliaCellClear<CR>
+autocmd FileType julia nnoremap <Leader>jp :JuliaCellPrevCell<CR>
+autocmd FileType julia nnoremap <Leader>jn :JuliaCellNextCell<CR>
+
+" map <Leader>jc to execute the current cell
+" nnoremap <Leader>jc :JuliaCellExecuteCell<CR>
+" map <Leader>jC to execute the current cell and jump to the next cell
+" nnoremap <Leader>jC :JuliaCellExecuteCellJump<CR>
+
+" nmap <Leader>js <Plug>SlimeLineSend
+" xmap <Leader>js <Plug>SlimeRegionSend
+" nmap <Leader>jc <Plug>SlimeSendCell
+
+" ============================================================================
+" LaTeX {{{1
+" ============================================================================
+
+autocmd FileType tex setlocal textwidth=90
+autocmd FileType tex setlocal colorcolumn=92
+"
+" nnoremap <silent> <leader>lc :VimtexCompile<CR>
+" nnoremap <silent> <leader>lv :VimtexView<CR>
+" nnoremap <silent> <leader>lo :VimtexTocOpen<CR>
+" nnoremap <silent> <leader>lt :VimtexTocToggle<CR>
+"
+" let g:vimtex_compiler_progname='nvr'
+" let g:vimtex_view_automatic = 0
+" let g:vimtex_quickfix_open_on_warning = 0
+" let g:tex_conceal = ""
+"
+" let g:tex_flavor = "pdflatex"
+" " let g:vimtex_compiler_engine='xelatex'
+" let g:Tex_CompileRule_pdf = 'pdflatex -synctex=1 -interaction=nonstopmode $*'
+"
+" " This is new style
+" " call deoplete#custom#var('omni', 'input_patterns', {
+" "             \ 'tex': g:vimtex#re#deoplete
+" "             \})
+"
+" let g:vimtex_compiler_latexmk = {
+"          \ 'build_dir' : 'build',
+"          \}
+"
+" " Skim config
+" let g:vimtex_view_general_viewer
+"         \ = '/Applications/Skim.app/Contents/SharedSupport/displayline'
+" let g:vimtex_view_general_options = '-r @line @pdf @tex'
+"
+" " This adds a callback hook that updates Skim after compilation
+" let g:vimtex_compiler_callback_hooks = ['UpdateSkim']
+"
+" function! UpdateSkim(status)
+"     if !a:status | return | endif
+"
+"     let l:out = b:vimtex.out()
+"     let l:tex = expand('%:p')
+"     let l:cmd = [g:vimtex_view_general_viewer, '-r']
+"
+"     if !empty(system('pgrep Skim'))
+"         call extend(l:cmd, ['-g'])
+"     endif
+"
+"     if has('nvim')
+"         call jobstart(l:cmd + [line('.'), l:out, l:tex])
+"     elseif has('job')
+"         call job_start(l:cmd + [line('.'), l:out, l:tex])
+"     else
+"         call system(join(l:cmd + [line('.'), shellescpe(l:out), shellescape(l:tex)], ' '))
+"     endif
+" endfunction
+"
+" ============================================================================
